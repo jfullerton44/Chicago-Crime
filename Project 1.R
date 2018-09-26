@@ -5,3 +5,5 @@ to2007 <- read.csv("Chicago_Crimes_2005_to_2007.csv")
 to2011 <- read.csv("Chicago_Crimes_2008_to_2011.csv")
 to2017 <- read.csv("Chicago_Crimes_2012_to_2017.csv")
 all <- rbind(to2004,to2007,to2011,to2017)
+
+library(ggplot2)
