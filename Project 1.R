@@ -1,4 +1,8 @@
 
+
+
+
+#Jake
 library(tidyverse)
 library(ggplot2)
 library(lubridate)
@@ -10,7 +14,7 @@ library(ggrepel)
 
 
 
-#setwd("/Users/blake/Documents/UVA/Fall 2018/DS 4001/Project 1")
+#
 
 setwd("~/Desktop/DS/Project1")
 to2004 <- read.csv("Chicago_Crimes_2001_to_2004.csv",stringsAsFactors=FALSE)
@@ -78,6 +82,11 @@ ggmap(map, extent = "device") + geom_density2d(data = singleCrime, aes(x = Longi
                  bins = 50, geom = "polygon") + scale_fill_gradient(low = "green", high = "red") + 
   scale_alpha(range = c(0, 0.3), guide = FALSE)
 
+
+
+
+#Blake
+
 library(varhandle)
 library(lubridate)
 library(tidyverse)
@@ -86,6 +95,12 @@ library(ggmap)
 library(dplyr)
 library(data.table)
 library(gridExtra)
+setwd("/Users/blake/Documents/UVA/Fall 2018/DS 4001/Project 1")
+to2004 <- read.csv("Chicago_Crimes_2001_to_2004.csv",stringsAsFactors=FALSE)
+to2007 <- read.csv("Chicago_Crimes_2005_to_2007.csv",stringsAsFactors=FALSE)
+to2011 <- read.csv("Chicago_Crimes_2008_to_2011.csv",stringsAsFactors=FALSE)
+to2017 <- read.csv("Chicago_Crimes_2012_to_2017.csv",stringsAsFactors=FALSE)
+all <- rbind(to2004,to2007,to2011,to2017)
 
 ## Code to extract only crimes in year 2001
 some_date <- lubridate::mdy_hms(to2004$Date)
