@@ -1,3 +1,4 @@
+
 library(tidyverse)
 library(ggplot2)
 library(lubridate)
@@ -10,6 +11,7 @@ library(ggrepel)
 
 
 #setwd("/Users/blake/Documents/UVA/Fall 2018/DS 4001/Project 1")
+
 setwd("~/Desktop/DS/Project1")
 to2004 <- read.csv("Chicago_Crimes_2001_to_2004.csv",stringsAsFactors=FALSE)
 to2007 <- read.csv("Chicago_Crimes_2005_to_2007.csv",stringsAsFactors=FALSE)
