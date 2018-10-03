@@ -44,7 +44,7 @@ map <- get_map(location=c(lon=-87.645167,lat=41.808013), zoom=11, maptype='roadm
 ```
 
 
-## Cleaning a sorting data
+## Cleaning an sorting data
 
 After the data has been imported I decided to only focus on the most recent 10 years to decrease processor load on my computer. Since some of the values were imported as strings they must be transformed to numeric values before they can be graphed. Finally, for the purpose of graphing only points with a latitude and longitude can be included so I creted a new dataframe with only points with a Latitude and Longitude.
 
