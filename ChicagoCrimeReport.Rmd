@@ -1,0 +1,137 @@
+---
+title: "Chicago Crime Report"
+author: "Blake Brown and Jacob Fullerton"
+date: "9/26/2018"
+output: html_document
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file,
+ encoding=encoding,
+ output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Imported Packages
+```{r Imports, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+library(ggplot2)
+library(ggmap)
+library(dplyr)
+library(data.table)
+library(ggrepel)
+```
+
+#Importing Data
+
+To import all the data we read in from csv files each year range seperatly and the combine all the data with rbind to create a complete data set.
+
+```{r Read CSV for data, warning=FALSE}
+to2004 <- read.csv("Chicago_Crimes_2001_to_2004.csv",stringsAsFactors=FALSE)
+to2007 <- read.csv("Chicago_Crimes_2005_to_2007.csv",stringsAsFactors=FALSE)
+to2011 <- read.csv("Chicago_Crimes_2008_to_2011.csv",stringsAsFactors=FALSE)
+to2017 <- read.csv("Chicago_Crimes_2012_to_2017.csv",stringsAsFactors=FALSE)
+all <- rbind(to2004,to2007,to2011,to2017)
+```
+
+In addition, to plot the data we must get a map of the area of Chicago
+```{r Get Map, message=FALSE, warning=FALSE}
+map <- get_map(location=c(lon=-87.645167,lat=41.808013), zoom=11, maptype='roadmap', color='bw')#Get the map from Google Maps
+```
+
+
+## Cleaning an sorting data
+
+After the data has been imported I decided to only focus on the most recent 10 years to decrease processor load on my computer. Since some of the values were imported as strings they must be transformed to numeric values before they can be graphed. Finally, for the purpose of graphing only points with a latitude and longitude can be included so I creted a new dataframe with only points with a Latitude and Longitude.
+
+```{r Clean Data, message=FALSE, warning=FALSE}
+crimes <- filter(all,Year>2007)
+crimes <-filter(crimes,Year<2018)
+crimes$Longitude <- as.numeric(crimes$Longitude)
+crimes$Latitude <- as.numeric(crimes$Latitude)
+hasLocation <- filter(crimes, !is.na(Longitude),!is.na(Latitude))
+```
+#Crime Distribution
+
+For my analysis of the Chicago Crime data set I will be focusing on the different distributions of crimes in chicago. Since there were over 30 different crimes, I chose 6 different crimes to analyze. These 6 crimes were chose because of their distrubtion and the popularity of the crime. To best reperesed the distribution of all the crimes I chose to create heatmaps for all instances of each crime in the past 10 years. 
+
+
+##Assault
+```{r Assault, warning=FALSE}
+singleCrime <- filter(hasLocation, Primary.Type =="ASSAULT")
+ggmap(map, extent = "device") + geom_density2d(data = singleCrime, aes(x = Longitude, y = Latitude), size = 0.3) + 
+  stat_density2d(data = singleCrime, 
+                 aes(x = Longitude, y = Latitude, fill = ..level.., alpha = ..level..), size = 0.01, 
+                 bins = 50, geom = "polygon") + scale_fill_gradient(low = "green", high = "red") + 
+  scale_alpha(range = c(0, 0.3), guide = FALSE)
+```
+
+Assault shows a distribution of many smaller centers around Chicago. One interesting aspect of this heatmap is that downtown Chicago has a high rate of assaults which is not seen in many of the other crimes.  Since assault can happen quickly and without planning this could lead to assaults appearting in more areas of Chicago.
+
+##Gambling
+```{r Gambling, warning=FALSE}
+
+singleCrime <- filter(hasLocation, Primary.Type =="GAMBLING")
+ggmap(map, extent = "device") + geom_density2d(data = singleCrime, aes(x = Longitude, y = Latitude), size = 0.3) + 
+  stat_density2d(data = singleCrime, 
+                 aes(x = Longitude, y = Latitude, fill = ..level.., alpha = ..level..), size = 0.01, 
+                 bins = 50, geom = "polygon") + scale_fill_gradient(low = "green", high = "red") + 
+  scale_alpha(range = c(0, 0.3), guide = FALSE)
+```
+
+Gambling shows a distribution very different from assault. The majority of gambling arrests are from one smaller area. This could be correlated to people running casinos out of their homes and simply moving it to a friends house after getting caught. Also people are willing to travel to gamble so other residents would likely travel to this area which allows underground casinos to cluster up in one area.
+
+##Kidnapping
+```{r Kidnapping, warning=FALSE}
+
+singleCrime <- filter(hasLocation, Primary.Type =="KIDNAPPING")
+ggmap(map, extent = "device") + geom_density2d(data = singleCrime, aes(x = Longitude, y = Latitude), size = 0.3) + 
+  stat_density2d(data = singleCrime, 
+                 aes(x = Longitude, y = Latitude, fill = ..level.., alpha = ..level..), size = 0.01, 
+                 bins = 50, geom = "polygon") + scale_fill_gradient(low = "green", high = "red") + 
+  scale_alpha(range = c(0, 0.3), guide = FALSE)
+```
+
+From this heatmap we can see that Kidnapping is very widespread throughout Chicago.  There is a large concentration to the West and South but overall the distribution seems large. This can mean that the kidnapping is more likely than other crimes to happen outside of just low income areas. However, there doesnt seem to be much of a presece in downtown Chicago, this is likely due to the fact that a kidnapping would be extremely difficult in a highly populated area.
+
+##Robbery
+```{r Robbery, warning=FALSE}
+
+singleCrime <- filter(hasLocation, Primary.Type =="ROBBERY")
+ggmap(map, extent = "device") + geom_density2d(data = singleCrime, aes(x = Longitude, y = Latitude), size = 0.3) + 
+  stat_density2d(data = singleCrime, 
+                 aes(x = Longitude, y = Latitude, fill = ..level.., alpha = ..level..), size = 0.01, 
+                 bins = 50, geom = "polygon") + scale_fill_gradient(low = "green", high = "red") + 
+  scale_alpha(range = c(0, 0.3), guide = FALSE)
+```
+
+Robbery is interesting becasue it seems to be clustered in smaller areas. This could be due to many factors such as areas of lower income or areas with more businesses with lower security. This shows an interesting comparison between robbery and assault, assault has larger centers of high concentrations while robbery has more smaller centers or high concentration. 
+
+##Homicide
+```{r Homicide, warning=FALSE}
+singleCrime <- filter(hasLocation, Primary.Type =="HOMICIDE")
+ggmap(map, extent = "device") + geom_density2d(data = singleCrime, aes(x = Longitude, y = Latitude), size = 0.3) + 
+  stat_density2d(data = singleCrime, 
+                 aes(x = Longitude, y = Latitude, fill = ..level.., alpha = ..level..), size = 0.01, 
+                 bins = 50, geom = "polygon") + scale_fill_gradient(low = "green", high = "red") + 
+  scale_alpha(range = c(0, 0.3), guide = FALSE)
+```
+
+Homicide shows a similar pattern to kidnapping where there are only 2 main clusters.  Since this is another more serious crime this could be due to people traveling to other areas to comit the crime or the difficulty of commiting the crime in very populated areas. Once again, it is also shown that the rate is low in downtown Chicago since the area is very populated and anyone who commits homicide there would certainly be caught.
+
+
+##Narcotics
+```{r Narcotics, warning=FALSE}
+singleCrime <- filter(hasLocation, Primary.Type =="NARCOTICS")
+ggmap(map, extent = "device") + geom_density2d(data = singleCrime, aes(x = Longitude, y = Latitude), size = 0.3) + 
+  stat_density2d(data = singleCrime, 
+                 aes(x = Longitude, y = Latitude, fill = ..level.., alpha = ..level..), size = 0.01, 
+                 bins = 50, geom = "polygon") + scale_fill_gradient(low = "green", high = "red") + 
+  scale_alpha(range = c(0, 0.3), guide = FALSE)
+```
+
+Narcotics shows a distribution very similar to gambling. This could be correlated to the majority of dealers living in one small area so arrests would all happen there. In this case we can see that West Chicago is the center of narcotics in Chicago.

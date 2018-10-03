@@ -1,0 +1,37 @@
+---
+title: "Chicago Crime Report"
+author: "Blake Brown and Jacob Fullerton"
+date: "9/26/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Importing Data
+
+To import all the data we read in from csv files each year range seperatly and the combine all the data with rbind to create a complete data set.
+
+```{r}
+to2004 <- read.csv("Chicago_Crimes_2001_to_2004.csv",stringsAsFactors=FALSE)
+to2007 <- read.csv("Chicago_Crimes_2005_to_2007.csv",stringsAsFactors=FALSE)
+to2011 <- read.csv("Chicago_Crimes_2008_to_2011.csv",stringsAsFactors=FALSE)
+to2017 <- read.csv("Chicago_Crimes_2012_to_2017.csv",stringsAsFactors=FALSE)
+all <- rbind(to2004,to2007,to2011,to2017)
+```
+
+## Cleaning a sorting data
+
+After the data has been imported I decided to only focus on the most recent 10 years to decrease processor load on my computer. Since some of the values were imported as strings they must be transformed to numeric values before they can be graphed. Finally, for the purpose of graphing only points with a latitude and longitude can be included so I creted a new dataframe with only points with a Latitude and Longitude.
+
+
+```{r}
+crimes <- filter(all,Year>2007)
+crimes <-filter(crimes,Year<2018)
+crimes$Longitude <- as.numeric(crimes$Longitude)
+crimes$Latitude <- as.numeric(crimes$Latitude)
+hasLocation <- filter(crimes, !is.na(Longitude),!is.na(Latitude))
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
