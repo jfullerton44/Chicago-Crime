@@ -9,22 +9,24 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+#Importing Data
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+To import all the data we read in from csv files each year range seperatly and the combine all the data with rbind to create a complete data set.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
 ```
 
-## Including Plots
+## Cleaning a sorting data
 
-You can also embed plots, for example:
+After the data has been imported I decided to only focus on the most recent 10 years to decrease processor load on my computer. Since some of the values were imported as strings they must be transformed to numeric values before they can be graphed. Finally, for the purpose of graphing only points with a latitude and longitude can be included so I creted a new dataframe with only points with a Latitude and Longitude.
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+```{r}
+crimes <- filter(all,Year>2007)
+crimes <-filter(crimes,Year<2018)
+crimes$Longitude <- as.numeric(crimes$Longitude)
+crimes$Latitude <- as.numeric(crimes$Latitude)
+hasLocation <- filter(crimes, !is.na(Longitude),!is.na(Latitude))
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
