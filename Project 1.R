@@ -66,7 +66,7 @@ p + geom_point(aes(x = Longitude, y = Latitude,  colour = Year), data = singleRa
 
 
 
-map <- get_map(location=c(lon=-87.645167,lat=41.808013), zoom=11, maptype='roadmap', color='bw')#Get the map from Google Maps
+map <- get_map(location=c(lon=-87.645167,lat=41.808013),api_key='AIzaSyBzD0JsQd1dyQzz8iUcB4sqyzhRSD17mGQ', zoom=11, maptype='roadmap', color='bw')#Get the map from Google Maps
 
 
 singleCrime <- filter(hasLocation, Primary.Type =="BURGLARY")
