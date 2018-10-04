@@ -41,6 +41,7 @@ all <- rbind(to2004,to2007,to2011,to2017)
 
 In addition, to plot the data we must get a map of the area of Chicago
 ```{r Get Map, message=FALSE, warning=FALSE}
+register_google(key = "AIzaSyC9rrtr993vzkQlEF3HfYdzwcj0ojOnLzA")
 map <- get_map(location=c(lon=-87.645167,lat=41.808013), zoom=11, maptype='roadmap', color='bw')#Get the map from Google Maps
 ```
 

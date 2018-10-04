@@ -48,16 +48,16 @@ col3 = "#b3cde0" ## very light blue
 col4 = "#CC0000" ## red
 
 get_googlemap(urlonly = TRUE)
-ggmap(get_googlemap(key='AIzaSyBzD0JsQd1dyQzz8iUcB4sqyzhRSD17mGQ'))
+ggmap(get_googlemap()
 
 ##1) Create a map with all of the crime locations plotted.
 p <- ggmap(get_googlemap(center = c(lon = -87.645167, lat = 41.808013),
                          zoom = 11, scale = 2,
                          maptype ='terrain',
                          color = 'color',
-                         key = 'AIzaSyBzD0JsQd1dyQzz8iUcB4sqyzhRSD17mGQ'
+                         key='AIzaSyC9rrtr993vzkQlEF3HfYdzwcj0ojOnLzA'
                          ))
-
+download.file('https://maps.googleapis.com/maps/api/staticmap?center=29.763284,-95.363271&zoom=11&key=AIzaSyC9rrtr993vzkQlEF3HfYdzwcj0ojOnLzA&size=640x640&scale=2&maptype=roadmap',destfile='map.',mode ="wb")
 
 Kidnappingp + geom_point(aes(x = Longitude, y = Latitude,  colour = Primary.Type), data = rand1000, size = 0.5) + 
   theme(legend.position="bottom")
@@ -70,10 +70,11 @@ p + geom_point(aes(x = Longitude, y = Latitude,  colour = Year), data = singleRa
 
 
 
+register_google(key = "AIzaSyC9rrtr993vzkQlEF3HfYdzwcj0ojOnLzA")
 
+map <- get_googlemap(location=c(lon=-87.645167,lat=41.808013),key='AIzaSyC9rrtr993vzkQlEF3HfYdzwcj0ojOnLzA', zoom=11, maptype='roadmap',color='bw')#Get the map from Google Maps
 
-map <- get_map(location=c(lon=-87.645167,lat=41.808013),api_key='AIzaSyBzD0JsQd1dyQzz8iUcB4sqyzhRSD17mGQ', zoom=11, maptype='roadmap', color='bw')#Get the map from Google Maps
-
+#,api_key='AIzaSyC9rrtr993vzkQlEF3HfYdzwcj0ojOnLzA'
 
 singleCrime <- filter(hasLocation, Primary.Type =="BURGLARY")
 ggmap(map, extent = "device") + geom_density2d(data = singleCrime, aes(x = Longitude, y = Latitude), size = 0.3) + 
