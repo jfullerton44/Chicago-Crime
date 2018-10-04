@@ -180,7 +180,7 @@ ggplot(hasLocation, aes(x=Month)) +
 ```
 
 This graphic is very intersting. One of the things that immediately pops out to me is the distribution for gambling. We can see that a majority of the gambling crimes are committed during the summer months and virtuallly non are committed during the winter months. We can also see that for assault, robbery, and homicide crimes the peak is during the summer. However, for kidnapping and narcotics the mose common months are late winter/early spring. It could be interesting to explore the location description to see if most of the crimes are committed outdoors, which would be why the distribution is like that.
-```{r,message=FALSE, warning=FALSE,fig.width=5,fig.height=4}
+```{r fig.height=5, fig.width=5, warning=FALSE}
 ## This is to help adjust the x axis values so the more popular crimes show only the more popular locations and
 ## the less popular crimes can show all the locations
 by_Crime <- Chicago.Aft.2008.Small%>% group_by(Primary.Type, Location.Description) %>% summarize(Total = n())
@@ -280,3 +280,8 @@ ggmap(map, extent = "device") + geom_density2d(data = singleCrime, aes(x = Longi
 ```
 
 Narcotics shows a distribution very similar to gambling. This could be correlated to the majority of dealers living in one small area so arrests would all happen there. In this case we can see that West Chicago is the center of narcotics in Chicago.
+
+
+#Conclusions
+
+From all of this data we can see that each crime has its own characteristics. The Chicago police could use this data in the future to target specifc crimes in certain months of the year or to target certain areas for types of crimes. The results of this data analysis can also show areas that might not need as much policing as others as the crime rate varies throughout Chicago. Overall, the results of this project show that each crime is unique and there is no way to have one blanket policy for the best way to stop all crimes togeather.  
