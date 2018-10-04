@@ -102,18 +102,6 @@ to2011 <- read.csv("Chicago_Crimes_2008_to_2011.csv",stringsAsFactors=FALSE)
 to2017 <- read.csv("Chicago_Crimes_2012_to_2017.csv",stringsAsFactors=FALSE)
 all <- rbind(to2004,to2007,to2011,to2017)
 
-## Code to extract only crimes in year 2001
-some_date <- lubridate::mdy_hms(to2004$Date)
-only_2001 <- to2004[year(some_date) == 2001,]
-## Code to extract only crimes in year 2008
-some_date3 <- lubridate::mdy_hms(to2011$Date)
-only_2008 <- to2011[year(some_date3) == 2008,]
-## Code to extract only crimes in year 2012
-some_date4 <- lubridate::mdy_hms(to2017$Date)
-only_2012 <- to2017[year(some_date4) == 2012,]
-## Code to extract only crimes in year 2017
-only_2017 <- to2017[year(some_date4) == 2017,]
-
 ##Only going to use data after 2008
 Chicago.Aft.2008 <- rbind(to2011, to2017)
 ## Select only the necessary columns to help run time
@@ -168,10 +156,6 @@ ggplot(numLocations, aes(x=Location.Description, y = num)) + geom_bar(stat = "id
 Primary_Crimes <- c("NARCOTICS", "ASSAULT", "GAMBLING", "KIDNAPPING", "ROBBERY","HOMICIDE")
 ## Extract only the crimes that had more than 5000
 Chicago.Aft.2008.Small <- Chicago.Aft.2008.Small[Chicago.Aft.2008.Small$Primary.Type %in% Primary_Crimes,]
-Chicago.Aft.2008.Small$Month <- month(Chicago.Aft.2008.Small$Date) 
-Chicago.Aft.2008.Small$Month <- as.factor(Chicago.Aft.2008.Small$Month)
-Chicago.Aft.2008.Small$Hour <- hour(Chicago.Aft.2008.Small$Date) 
-Chicago.Aft.2008.Small$Hour <- as.factor(Chicago.Aft.2008.Small$Hour)
 
 
 ## Lineplot to look at the number of crimes per month

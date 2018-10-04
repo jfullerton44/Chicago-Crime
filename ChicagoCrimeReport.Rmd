@@ -17,13 +17,14 @@ knitr::opts_chunk$set(echo = TRUE)
 #Imported Packages
 ```{r Imports, message=FALSE, warning=FALSE}
 library(tidyverse)
-library(ggplot2)
 library(lubridate)
 library(ggplot2)
 library(ggmap)
 library(dplyr)
 library(data.table)
 library(ggrepel)
+library(varhandle)
+library(gridExtra)
 ```
 
 #Importing Data
@@ -46,7 +47,7 @@ map <- get_map(location=c(lon=-87.645167,lat=41.808013), zoom=11, maptype='roadm
 
 ## Cleaning an sorting data
 
-After the data has been imported I decided to only focus on the most recent 10 years to decrease processor load on my computer. Since some of the values were imported as strings they must be transformed to numeric values before they can be graphed. Finally, for the purpose of graphing only points with a latitude and longitude can be included so I creted a new dataframe with only points with a Latitude and Longitude.
+After the data has been imported we decided to only focus on the most recent 10 years to decrease processor load on the computer. Since some of the values were imported as strings they must be transformed to numeric values before they can be graphed. Finally, for the purpose of graphing only points with a latitude and longitude can be included so we created a new dataframe with only points with a Latitude and Longitude. We also decided to create new columns using the date to help with exploratory data analysis.
 
 ```{r Clean Data, message=FALSE, warning=FALSE}
 crimes <- filter(all,Year>2007)
@@ -54,10 +55,129 @@ crimes <-filter(crimes,Year<2018)
 crimes$Longitude <- as.numeric(crimes$Longitude)
 crimes$Latitude <- as.numeric(crimes$Latitude)
 hasLocation <- filter(crimes, !is.na(Longitude),!is.na(Latitude))
+hasLocation$Day <- factor(day(as.POSIXlt(hasLocation$Date, format="%m/%d/%Y %I:%M:%S %p")))
+hasLocation$Month <- factor(month(as.POSIXlt(hasLocation$Date, format="%m/%d/%Y %I:%M:%S %p")))
+hasLocation$Year <- factor(year(as.POSIXlt(hasLocation$Date, format="%m/%d/%Y %I:%M:%S %p")))
+hasLocation$Date <- as.Date(Chicago.Aft.2008$Date, "%m/%d/%Y %I:%M:%S %p")
+str(hasLocation) ##make sure our variables are of the proper class
 ```
-#Crime Distribution
 
-For my analysis of the Chicago Crime data set I will be focusing on the different distributions of crimes in chicago. Since there were over 30 different crimes, I chose 6 different crimes to analyze. These 6 crimes were chose because of their distrubtion and the popularity of the crime. To best reperesed the distribution of all the crimes I chose to create heatmaps for all instances of each crime in the past 10 years. 
+## Exploratory Data Analysis
+Before we go about looking at the distributions of the crimes we chose, it is important to get a better understanding of the data. In order to achieve this we will be making visualizations to help us understand the data we have. First we will look at the number of crimes.
+```{r Exploratory Data Analysis, message=FALSE, warning=FALSE}
+by_Crime <- hasLocation %>% group_by(Primary.Type) 
+numCrimes <- summarize(by_Crime, num = n())
+View(numCrimes)
+numCrimes <- numCrimes[numCrimes$num>5000,]
+## Histogram of the Crimes Committed
+ggplot(numCrimes, aes(x=reorder(Primary.Type, num), num)) + geom_bar(stat = "identity", 
+                                                                     color = "black", fill = "white") + 
+  coord_flip() +
+  xlab("Crime") + ylab("Number of Crimes Committed") + ggtitle("Distribution of Crimes Committed") +
+  theme(
+    axis.text.y = element_text(vjust = .5, hjust = 1, size = 5)
+  )
+```
+From this graphic we can see that theft and battery are the most common crimes. One interesting note from this graphic would be the fact that there is a category called other offense. It would be interesting to see what is in this category. However, as it contains a wide variety of crimes it would be better to not use this in our analysis. Next we will explore the number of crimes committed based upon on the month.
+```{r}
+ggplot(hasLocation, aes(x=Month)) +
+  geom_bar(colour="black", fill="white") +
+  ylab('Number of Crimes Committed') + ggtitle("Distribution of Crimes per Month") +
+  xlab("Month") + theme(plot.title = element_text(hjust = .5))
+```
+Interestingly, the number of crimes committed appears to peak during the summer months and sharply declines at the end of the year. This could be because during the summer months more people are out and about in Chicago and during the winter months most people elect to stay in their homes to avoid the cold. The more people being our causes more street and sidewalk crimes. One more interesting graphic to look at before we focus on only the crimes is the proportion of arresets by year and month.
+
+```{r}
+## Colors for the gradient scale
+colors <- c('navyblue', 'darkmagenta', 'darkorange1')
+
+## Gets only the rows that resulted in arrests
+arrests_only <- Chicago.Aft.2008.Small[Chicago.Aft.2008.Small$Arrest == 'True',]
+## Groups the arrests count by year and month with a total which is the count
+by_arrests <- arrests_only %>% group_by(Year, Month) %>% summarise(Total = n())
+## Groups by the Year and month with a total which is count
+by_crime <- Chicago.Aft.2008.Small %>% group_by(Year, Month) %>% summarise(Total = n())
+total <- cbind(crime_total=by_crime$Total, by_arrests)
+total$prop <- total$Total/total$crime_total
+
+prop <- ggplot(total, aes(Year, Month, fill = total$prop)) +
+  geom_tile(size = 1, color = "white") + scale_fill_gradientn(colors = colors) + 
+  geom_text(aes(label=round(total$prop, digits = 3)), color='white', size = 3) +
+  labs(fill = "Proportion") +
+  ggtitle("Proportion of Crimes Resulting in \nArrests by Year and Month") + 
+  theme(legend.title = element_text(hjust = .5),  ## Centered the legend title 
+        plot.title = element_text(hjust = .5), ## Centered the plot title
+        panel.background = element_blank()
+  )
+prop
+
+```
+This graphic is very intersting. We can see that the mosts arrests occur around February every year. About 1/3 of the crimes committed in February resulted in an arrest. We can see that on average that about 26% percent of the crimes actually resulted in an arrest. This is much lower than what we would suspect it to be. This would suggest that there was not enough credible evidence or witnesses to support these crimes. 
+```{r}
+## Histogram of the number crimes committed for each location
+ggplot(numLocations, aes(reorder(Location.Description,num), y = num)) + geom_bar(stat = "identity", color = "black", fill = "white") + coord_flip() +
+  xlab("Location") + ylab("Number of Crimes Committed") + ggtitle("Distribution of Locations") +
+  theme(
+    axis.text.y = element_text(vjust = .5, hjust = 1, size = 5.5)
+  )
+```
+We can see that the majority of crimes occur on the street and resential areas. Again there is an interesting "other" category. Again we will not include this in our analysis because there is no clear answer as to what "other" is. We will continue exploring by using only the six crimes we have chose, Narcotics, Assualt, Gambling, Kidnappung, Robbery, and Homicide.
+```{r,message=FALSE, warning=FALSE}
+## The primary crimes we chose
+Primary_Crimes <- c("NARCOTICS", "ASSAULT", "GAMBLING", "KIDNAPPING", "ROBBERY","HOMICIDE")
+## The data is only using our primary crimes
+hasLocation <- hasLocation[hasLocation$Primary.Type %in% Primary_Crimes,]
+## First we need to groupby the date
+by_Date <- hasLocation%>% group_by(Date) %>% summarise(Total = n())
+## Group by date and crime committed
+by_Date2 <- hasLocation%>% group_by(Date, Primary.Type) %>% summarise(Total = n())
+## Now plotting the graphic
+ggplot(by_Date, aes(x=by_Date$Date, y=by_Date$Total)) + geom_smooth(se=FALSE) + 
+  xlab("Date") + ylab("Total Amount of Crimes") + ggtitle("Number of Crimes per Day") +
+  theme(plot.title = element_text(hjust = .5))
+```
+From this smooth line plot of the number of crimes per day we can see that crime has generally decreased from 2008, with a steep decline from 2010 to 2012. After 2012 we see that the line is generally decreasing, resulting in less crimes committed. 
+```{r,message=FALSE, warning=FALSE}
+## Coloring the lines based upon the 6 different crimes
+ggplot(by_Date2, aes(x=by_Date2$Date, y=by_Date2$Total, color = by_Date2$Primary.Type)) + geom_smooth(se = FALSE) + 
+  xlab("Date") + ylab("Total Amount of Crimes") + ggtitle("Number of Crimes per Day") +
+  labs(color = "Crime") + theme(plot.title = element_text(hjust = .5),
+                                legend.title = element_text(hjust = .5),
+                                legend.position=c(1,1), legend.justification=c(1,1), 
+                                legend.background = element_blank(),
+                                legend.key = element_blank()
+                                )
+```
+
+We can see that infact from 2008 to 2014 that most of the crimes decrease, expect those that were small amounts anyways. However, starting in 2014 we can see that the number assault, and robbery crimes have increased, passing the number of narcotic crimes. One theory for this is the focus on drug busting has cause other types of crime to become overlooked thus becoming committed more. Time to explore the number of crimes committed for each of the six crimes by month.
+
+```{r,message=FALSE, warning=FALSE}
+ggplot(hasLocation, aes(x=Month)) +
+  geom_bar(colour="black", fill="white") +
+  ylab('Count') + ggtitle("Distribution of Crimes per Month") +
+  xlab("Month") + facet_wrap(~hasLocation$Primary.Type, scales='free')
+```
+This graphic is very intersting. One of the things that immediately pops out to me is the distribution for gambling. We can see that a majority of the gambling crimes are committed during the summer months and virtuallly non are committed during the winter months. We can also see that for assault, robbery, and homicide crimes the peak is during the summer. However, for kidnapping and narcotics the mose common months are late winter/early spring. It could be interesting to explore the location description to see if most of the crimes are committed outdoors, which would be why the distribution is like that.
+```{r,message=FALSE, warning=FALSE,fig.width=5,fig.height=4}
+## This is to help adjust the x axis values so the more popular crimes show only the more popular locations and
+## the less popular crimes can show all the locations
+by_Crime <- Chicago.Aft.2008.Small%>% group_by(Primary.Type, Location.Description) %>% summarize(Total = n())
+by_Crime <- by_Crime[((by_Crime$Total > 2000 & by_Crime$Primary.Type %in% c("ASSAULT", "NARCOTICS", "ROBBERY")) | 
+            (by_Crime$Total > 20 & by_Crime$Primary.Type %in% c("GAMBLING","HOMICIDE","KIDNAPPING") )),]
+
+ggplot(by_Crime, aes(reorder(Location.Description, -Total), y=Total)) +
+  geom_bar(stat = "identity",colour="black", fill="white") +
+  ylab('Count') + ggtitle("Distribution of Crimes per Month") +
+  xlab("Month") + 
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, size = 6),
+        plot.title = element_text(hjust = .5)) +
+  facet_wrap(.~Primary.Type, scales = "free")
+
+```
+As we suspected earlier we can see that the most common location for gambling crimes is the street, sidewalk, and alley. All of which are outside therefore, during the winter less gamblind crimes will be committed. Another interesting note is the amoount of kidnapping crimes that happen in residence and apartment. This could be problems over custody of children or people breaking in to others homes. Now onto the geographical distribution of these crimes. 
+#Crime Distribution
+For our analysis of the Chicago Crime data set we will be focusing on the different distributions of crimes in chicago. Since there were over 30 different crimes, we chose 6 different crimes to analyze. These 6 crimes were chosen because of their distrubtion and the popularity of the crime. To best reperesed the distribution of all the crimes we chose to create heatmaps for all instances of each crime in the past 10 years. 
+
 
 
 ##Assault
@@ -70,7 +190,7 @@ ggmap(map, extent = "device") + geom_density2d(data = singleCrime, aes(x = Longi
   scale_alpha(range = c(0, 0.3), guide = FALSE)
 ```
 
-Assault shows a distribution of many smaller centers around Chicago. One interesting aspect of this heatmap is that downtown Chicago has a high rate of assaults which is not seen in many of the other crimes.  Since assault can happen quickly and without planning this could lead to assaults appearting in more areas of Chicago.
+Assault shows a distribution of many smaller centers around Chicago. One interesting aspect of this heatmap is that downtown Chicago has a high rate of assaults which is not seen in many of the other crimes. Since assault can happen quickly and without planning this could lead to assaults appearting in more areas of Chicago.
 
 ##Gambling
 ```{r Gambling, warning=FALSE}
@@ -96,7 +216,7 @@ ggmap(map, extent = "device") + geom_density2d(data = singleCrime, aes(x = Longi
   scale_alpha(range = c(0, 0.3), guide = FALSE)
 ```
 
-From this heatmap we can see that Kidnapping is very widespread throughout Chicago.  There is a large concentration to the West and South but overall the distribution seems large. This can mean that the kidnapping is more likely than other crimes to happen outside of just low income areas. However, there doesnt seem to be much of a presece in downtown Chicago, this is likely due to the fact that a kidnapping would be extremely difficult in a highly populated area.
+From this heatmap we can see that Kidnapping is very widespread throughout Chicago.  There is a large concentration to the West and South but overall the distribution seems large. This can mean that the kidnapping is more likely than other crimes to happen outside of just low income areas. However, there doesn't seem to be much of a presece in downtown Chicago, this is likely due to the fact that a kidnapping would be extremely difficult in a highly populated area.
 
 ##Robbery
 ```{r Robbery, warning=FALSE}
