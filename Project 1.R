@@ -117,7 +117,7 @@ Chicago.Aft.2008.Small$Day <- factor(day(as.POSIXlt(Chicago.Aft.2008.Small$Date,
 Chicago.Aft.2008.Small$Month <- factor(month(as.POSIXlt(Chicago.Aft.2008.Small$Date, format="%m/%d/%Y %I:%M:%S %p")))
 Chicago.Aft.2008.Small$Year <- factor(year(as.POSIXlt(Chicago.Aft.2008.Small$Date, format="%m/%d/%Y %I:%M:%S %p")))
 
-Chicago.Aft.2008.Small$Date <- as.Date(Chicago.Aft.2008$Date, "%m/%d/%Y %I:%M:%S %p")
+Chicago.Aft.2008.Small$Date <- as.Date(Chicago.Aft.2008.Small$Date, "%m/%d/%Y %I:%M:%S %p")
 Chicago.Aft.2008.Small <- Chicago.Aft.2008.Small[Chicago.Aft.2008.Small$Year != "2017", ] ##exclude the year 2017
 Chicago.Aft.2008.Small <- na.omit(Chicago.Aft.2008.Small) ## removes any NA's introduced by coercion
 str(Chicago.Aft.2008.Small) ##make sure our variables are of the proper class

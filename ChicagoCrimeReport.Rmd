@@ -60,7 +60,20 @@ hasLocation <- filter(crimes, !is.na(Longitude),!is.na(Latitude))
 hasLocation$Day <- factor(day(as.POSIXlt(hasLocation$Date, format="%m/%d/%Y %I:%M:%S %p")))
 hasLocation$Month <- factor(month(as.POSIXlt(hasLocation$Date, format="%m/%d/%Y %I:%M:%S %p")))
 hasLocation$Year <- factor(year(as.POSIXlt(hasLocation$Date, format="%m/%d/%Y %I:%M:%S %p")))
-hasLocation$Date <- as.Date(Chicago.Aft.2008$Date, "%m/%d/%Y %I:%M:%S %p")
+hasLocation$Date <- as.Date(hasLocation$Date, "%m/%d/%Y %I:%M:%S %p")
+Chicago.Aft.2008.Small <- Chicago.Aft.2008 %>% select(Date, Primary.Type, Location.Description, Arrest, Year, Latitude, Longitude)
+Chicago.Aft.2008.Small <- na.omit(Chicago.Aft.2008.Small) ## removes any NA's
+
+Chicago.Aft.2008.Small$Latitude <- as.numeric(Chicago.Aft.2008.Small$Latitude) ## Changes latitude to a numeric 
+Chicago.Aft.2008.Small$Longitude <- as.numeric(Chicago.Aft.2008.Small$Longitude) ## Changes latitude to a numeric 
+Chicago.Aft.2008.Small$Day <- factor(day(as.POSIXlt(Chicago.Aft.2008.Small$Date, format="%m/%d/%Y %I:%M:%S %p")))
+Chicago.Aft.2008.Small$Month <- factor(month(as.POSIXlt(Chicago.Aft.2008.Small$Date, format="%m/%d/%Y %I:%M:%S %p")))
+Chicago.Aft.2008.Small$Year <- factor(year(as.POSIXlt(Chicago.Aft.2008.Small$Date, format="%m/%d/%Y %I:%M:%S %p")))
+
+Chicago.Aft.2008.Small$Date <- as.Date(Chicago.Aft.2008.Small$Date, "%m/%d/%Y %I:%M:%S %p")
+Chicago.Aft.2008.Small <- Chicago.Aft.2008.Small[Chicago.Aft.2008.Small$Year != "2017", ] ##exclude the year 2017
+Chicago.Aft.2008.Small <- na.omit(Chicago.Aft.2008.Small) ## removes any NA's introduced by coercion
+str(Chicago.Aft.2008.Small) ##make sure our variables are of the proper class
 str(hasLocation) ##make sure our variables are of the proper class
 ```
 
@@ -117,6 +130,9 @@ prop
 This graphic is very intersting. We can see that the mosts arrests occur around February every year. About 1/3 of the crimes committed in February resulted in an arrest. We can see that on average that about 26% percent of the crimes actually resulted in an arrest. This is much lower than what we would suspect it to be. This would suggest that there was not enough credible evidence or witnesses to support these crimes. 
 ```{r}
 ## Histogram of the number crimes committed for each location
+by_Location <- Chicago.Aft.2008.Small %>% group_by(Location.Description) 
+numLocations <- summarize(by_Location, num = n())
+numLocations <- numLocations[numLocations$num>5000,]
 ggplot(numLocations, aes(reorder(Location.Description,num), y = num)) + geom_bar(stat = "identity", color = "black", fill = "white") + coord_flip() +
   xlab("Location") + ylab("Number of Crimes Committed") + ggtitle("Distribution of Locations") +
   theme(
