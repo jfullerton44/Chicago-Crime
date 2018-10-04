@@ -73,8 +73,6 @@ Chicago.Aft.2008.Small$Year <- factor(year(as.POSIXlt(Chicago.Aft.2008.Small$Dat
 Chicago.Aft.2008.Small$Date <- as.Date(Chicago.Aft.2008.Small$Date, "%m/%d/%Y %I:%M:%S %p")
 Chicago.Aft.2008.Small <- Chicago.Aft.2008.Small[Chicago.Aft.2008.Small$Year != "2017", ] ##exclude the year 2017
 Chicago.Aft.2008.Small <- na.omit(Chicago.Aft.2008.Small) ## removes any NA's introduced by coercion
-str(Chicago.Aft.2008.Small) ##make sure our variables are of the proper class
-str(hasLocation) ##make sure our variables are of the proper class
 ```
 
 ## Exploratory Data Analysis
@@ -193,6 +191,8 @@ ggplot(by_Crime, aes(reorder(Location.Description, -Total), y=Total)) +
 
 ```
 As we suspected earlier we can see that the most common location for gambling crimes is the street, sidewalk, and alley. All of which are outside therefore, during the winter less gamblind crimes will be committed. Another interesting note is the amoount of kidnapping crimes that happen in residence and apartment. This could be problems over custody of children or people breaking in to others homes. Now onto the geographical distribution of these crimes. 
+
+
 #Crime Distribution
 For our analysis of the Chicago Crime data set we will be focusing on the different distributions of crimes in chicago. Since there were over 30 different crimes, we chose 6 different crimes to analyze. These 6 crimes were chosen because of their distrubtion and the popularity of the crime. To best reperesed the distribution of all the crimes we chose to create heatmaps for all instances of each crime in the past 10 years. 
 
