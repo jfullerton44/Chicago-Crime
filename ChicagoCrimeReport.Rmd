@@ -91,6 +91,7 @@ ggplot(numCrimes, aes(x=reorder(Primary.Type, num), num)) + geom_bar(stat = "ide
     axis.text.y = element_text(vjust = .5, hjust = 1, size = 5)
   )
 ```
+
 From this graphic we can see that theft and battery are the most common crimes. One interesting note from this graphic would be the fact that there is a category called other offense. It would be interesting to see what is in this category. However, as it contains a wide variety of crimes it would be better to not use this in our analysis. Next we will explore the number of crimes committed based upon on the month.
 ```{r}
 ggplot(hasLocation, aes(x=Month)) +
@@ -98,6 +99,7 @@ ggplot(hasLocation, aes(x=Month)) +
   ylab('Number of Crimes Committed') + ggtitle("Distribution of Crimes per Month") +
   xlab("Month") + theme(plot.title = element_text(hjust = .5))
 ```
+
 Interestingly, the number of crimes committed appears to peak during the summer months and sharply declines at the end of the year. This could be because during the summer months more people are out and about in Chicago and during the winter months most people elect to stay in their homes to avoid the cold. The more people being our causes more street and sidewalk crimes. One more interesting graphic to look at before we focus on only the crimes is the proportion of arresets by year and month.
 
 ```{r}
@@ -125,6 +127,7 @@ prop <- ggplot(total, aes(Year, Month, fill = total$prop)) +
 prop
 
 ```
+
 This graphic is very intersting. We can see that the mosts arrests occur around February every year. About 1/3 of the crimes committed in February resulted in an arrest. We can see that on average that about 26% percent of the crimes actually resulted in an arrest. This is much lower than what we would suspect it to be. This would suggest that there was not enough credible evidence or witnesses to support these crimes. 
 ```{r}
 ## Histogram of the number crimes committed for each location
@@ -137,6 +140,7 @@ ggplot(numLocations, aes(reorder(Location.Description,num), y = num)) + geom_bar
     axis.text.y = element_text(vjust = .5, hjust = 1, size = 5.5)
   )
 ```
+
 We can see that the majority of crimes occur on the street and resential areas. Again there is an interesting "other" category. Again we will not include this in our analysis because there is no clear answer as to what "other" is. We will continue exploring by using only the six crimes we have chose, Narcotics, Assualt, Gambling, Kidnappung, Robbery, and Homicide.
 ```{r,message=FALSE, warning=FALSE}
 ## The primary crimes we chose
@@ -152,6 +156,7 @@ ggplot(by_Date, aes(x=by_Date$Date, y=by_Date$Total)) + geom_smooth(se=FALSE) +
   xlab("Date") + ylab("Total Amount of Crimes") + ggtitle("Number of Crimes per Day") +
   theme(plot.title = element_text(hjust = .5))
 ```
+
 From this smooth line plot of the number of crimes per day we can see that crime has generally decreased from 2008, with a steep decline from 2010 to 2012. After 2012 we see that the line is generally decreasing, resulting in less crimes committed. 
 ```{r,message=FALSE, warning=FALSE}
 ## Coloring the lines based upon the 6 different crimes
@@ -173,6 +178,7 @@ ggplot(hasLocation, aes(x=Month)) +
   ylab('Count') + ggtitle("Distribution of Crimes per Month") +
   xlab("Month") + facet_wrap(~hasLocation$Primary.Type, scales='free')
 ```
+
 This graphic is very intersting. One of the things that immediately pops out to me is the distribution for gambling. We can see that a majority of the gambling crimes are committed during the summer months and virtuallly non are committed during the winter months. We can also see that for assault, robbery, and homicide crimes the peak is during the summer. However, for kidnapping and narcotics the mose common months are late winter/early spring. It could be interesting to explore the location description to see if most of the crimes are committed outdoors, which would be why the distribution is like that.
 ```{r,message=FALSE, warning=FALSE,fig.width=5,fig.height=4}
 ## This is to help adjust the x axis values so the more popular crimes show only the more popular locations and
@@ -190,6 +196,7 @@ ggplot(by_Crime, aes(reorder(Location.Description, -Total), y=Total)) +
   facet_wrap(.~Primary.Type, scales = "free")
 
 ```
+
 As we suspected earlier we can see that the most common location for gambling crimes is the street, sidewalk, and alley. All of which are outside therefore, during the winter less gamblind crimes will be committed. Another interesting note is the amoount of kidnapping crimes that happen in residence and apartment. This could be problems over custody of children or people breaking in to others homes. Now onto the geographical distribution of these crimes. 
 
 
